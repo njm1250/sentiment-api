@@ -2,8 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer # type: ignore
 from datetime import datetime, timedelta
-from decouple import config
-import praw
+from decouple import config # type: ignore
+import praw # type: ignore
 
 def get_recent_reddit_posts(request):
     client_id = config('REDDIT_CLIENT_ID')  
@@ -16,7 +16,7 @@ def get_recent_reddit_posts(request):
         user_agent=user_agent
     )
 
-    # 서브레딧
+    # 서브레딧 stocks, investing, cryptocurrency, Bitcoin, ethtrader
     subreddit = reddit.subreddit('cryptocurrency')
     query = "xrp"  
 
