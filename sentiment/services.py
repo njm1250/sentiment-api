@@ -2,6 +2,7 @@ from decouple import config # type: ignore
 import praw # type: ignore
 from datetime import datetime
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer # type: ignore
+import math
 
 def get_recent_reddit_posts(subreddit_name, search_term, post_limit, time_period):
     client_id = config('REDDIT_CLIENT_ID')  
@@ -31,13 +32,16 @@ def get_recent_reddit_posts(subreddit_name, search_term, post_limit, time_period
 def calculate_avg_sentiment(posts):
     total_sentiment = 0
     for post in posts:
-        total_sentiment += analyze_sentiment(post['content']) 
+        total_sentiment += analyze_sentiment(post['content'], post['score']) 
     return total_sentiment / len(posts) if posts else 0  
 
-def analyze_sentiment(content):
+def analyze_sentiment(content, score):
     analyzer = SentimentIntensityAnalyzer()
     vs = analyzer.polarity_scores(content)
-    return vs['compound']
+
+    # log함수로 가중치 조정 (score = upvote - downvote)
+    weighted_sentiment = vs['compound'] * (1 + math.log1p(score))
+    return weighted_sentiment
 
 def preprocess():
     # 전처리
