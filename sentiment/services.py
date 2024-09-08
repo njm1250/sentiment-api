@@ -1,8 +1,18 @@
-from decouple import config # type: ignore
-import praw # type: ignore
+from decouple import config  # 환경 변수 관리
+import praw  # Reddit API 클라이언트
 from datetime import datetime
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer # type: ignore
 import math
+from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline  # Hugging Face
+import torch
+
+model_dir = "./models/distilbert" 
+model = AutoModelForSequenceClassification.from_pretrained(model_dir)
+tokenizer = AutoTokenizer.from_pretrained(model_dir)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # GPU 사용 가능시 CUDA
+
+# 파이프라인 생성
+sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer, device=0 if torch.cuda.is_available() else -1)
+
 
 def get_recent_reddit_posts(subreddit_name, search_term, post_limit, time_period):
     client_id = config('REDDIT_CLIENT_ID')  
@@ -15,7 +25,6 @@ def get_recent_reddit_posts(subreddit_name, search_term, post_limit, time_period
         user_agent=user_agent
     )
 
-    # 서브레딧 stocks, investing, cryptocurrency, Bitcoin, ethtrader
     subreddit = reddit.subreddit(subreddit_name)
     query = search_term 
 
@@ -36,13 +45,15 @@ def calculate_avg_sentiment(posts):
     return total_sentiment / len(posts) if posts else 0  
 
 def analyze_sentiment(content, score):
-    analyzer = SentimentIntensityAnalyzer()
-    vs = analyzer.polarity_scores(content)
+    result = sentiment_analyzer(content)
+    
+    sentiment_score = result[0]['score'] if result[0]['label'] == 'POSITIVE' else -result[0]['score']
 
     # log함수로 가중치 조정 (score = upvote - downvote)
-    weighted_sentiment = vs['compound'] * (1 + math.log1p(score))
+    weighted_sentiment = sentiment_score * (1 + 0.1 * math.log1p(score))
+
     return weighted_sentiment
 
 def preprocess():
-    # 전처리
+    # 필요시 전처리 작업 수행
     return 0
