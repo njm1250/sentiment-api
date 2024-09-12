@@ -1,9 +1,20 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import JsonResponse
 from . import services
 
-def index(request):
-    posts = services.get_recent_reddit_posts('all', 'btc', 10, 'day')
-    avg_sentiment = services.calculate_avg_sentiment(posts)
+def query(request):
+    keyword = request.GET.get('keyword')
+    timeframe = request.GET.get('timeframe', 'day') 
     
-    return HttpResponse('Avg Score: ' + str(avg_sentiment))
+    if not keyword:
+        return JsonResponse({'error': 'Keyword parameter is required.'}, status=400)
+
+    posts = services.get_recent_reddit_posts('all', keyword, 10, timeframe)
+    sentiment_score = services.calculate_avg_sentiment(posts)
+
+    response_data = {
+        'keyword': keyword,
+        'sentiment_score': sentiment_score
+    }
+    
+    return JsonResponse(response_data)
