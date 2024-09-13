@@ -1,9 +1,11 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from . import services
-from ratelimit.decorators import ratelimit
+from django_ratelimit.decorators import ratelimit
+from django.views.decorators.cache import cache_page
 
-@ratelimit(key='ip', rate='5/m', method='GET', block=True) 
+@ratelimit(key='ip', rate='100/h', method='GET', block=True)
+@cache_page(60 * 15)
 def query(request):
     keyword = request.GET.get('keyword')
     timeframe = request.GET.get('timeframe', 'day') 
