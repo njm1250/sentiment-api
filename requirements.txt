@@ -51,3 +51,4 @@ update-checker==0.18.0
 urllib3==2.2.2
 vaderSentiment==3.3.2
 websocket-client==1.8.0
+django-ratelimit=4.1.0

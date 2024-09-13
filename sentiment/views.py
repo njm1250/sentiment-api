@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from . import services
+from ratelimit.decorators import ratelimit
 
+@ratelimit(key='ip', rate='5/m', method='GET', block=True) 
 def query(request):
     keyword = request.GET.get('keyword')
     timeframe = request.GET.get('timeframe', 'day') 
-    
+
     if not keyword:
         return JsonResponse({'error': 'Keyword parameter is required.'}, status=400)
 
