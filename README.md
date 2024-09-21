@@ -1,6 +1,6 @@
 # Sentiment API
 
-An API that provides sentiment analysis for various purposes, with a focus on finance. This API is designed to help users analyze the sentiment around assets, stocks, cryptocurrencies, and more using data from social media and other sources.
+An API that provides sentiment analysis for various purposes. It helps users understand the sentiment around topics such as stocks and cryptocurrencies using data from social media. Currently, the data comes exclusively from Reddit.
 
 ## Features
 - **Keyword-based Sentiment Analysis**: Analyze sentiment based on specific keywords.
