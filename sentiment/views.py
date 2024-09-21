@@ -38,3 +38,18 @@ def query(request):
     }
     
     return JsonResponse(response_data)
+
+@ratelimit(key='ip', rate='100/h', method='GET', block=True)
+@cache_page(60 * 15)
+def links(request):
+    link = request.GET.get('link')
+    
+    if not link:
+        return JsonResponse({'error': 'Link parameter is required.'}, status=400)
+    
+    result = services.analyze_link(link)
+    
+    if 'error' in result:
+        return JsonResponse(result, status=400)
+    
+    return JsonResponse(result)

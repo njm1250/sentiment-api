@@ -4,6 +4,7 @@ from datetime import datetime
 import math
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline  # Hugging Face
 import torch
+from newspaper import Article
 
 model_dir = "./models/distilbert" 
 model = AutoModelForSequenceClassification.from_pretrained(model_dir)
@@ -13,12 +14,11 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # GPU 사
 # 파이프라인 생성
 sentiment_analyzer = pipeline("sentiment-analysis", model=model, tokenizer=tokenizer, device=0 if torch.cuda.is_available() else -1)
 
+client_id = config('REDDIT_CLIENT_ID')  
+client_secret = config('REDDIT_SECRET')  
+user_agent = config('REDDIT_USER_AGENT')
 
-def get_recent_reddit_posts(subreddit_name, search_term, post_limit, time_period):
-    client_id = config('REDDIT_CLIENT_ID')  
-    client_secret = config('REDDIT_SECRET')  
-    user_agent = config('REDDIT_USER_AGENT')  
-
+def get_recent_reddit_posts(subreddit_name, search_term, post_limit, time_period):  
     reddit = praw.Reddit(
         client_id=client_id,
         client_secret=client_secret,
@@ -45,7 +45,11 @@ def calculate_avg_sentiment(posts):
     return total_sentiment / len(posts) if posts else 0  
 
 def analyze_sentiment(content, score):
-    result = sentiment_analyzer(content)
+    # 최대 입력 길이 
+    max_length = 512
+    truncated_content = content[:max_length]
+    
+    result = sentiment_analyzer(truncated_content)
     
     sentiment_score = result[0]['score'] if result[0]['label'] == 'POSITIVE' else -result[0]['score']
 
@@ -53,6 +57,26 @@ def analyze_sentiment(content, score):
     weighted_sentiment = sentiment_score * (1 + 0.1 * math.log1p(score))
 
     return weighted_sentiment
+
+def analyze_link(link):
+    try:
+        article = Article(link)
+        article.download()
+        article.parse()
+        text = article.text
+    except Exception as e:
+        return {'error': f'Failed to extract text from the link. Error: {str(e)}'}
+
+    # 텍스트가 추출되지 않은 경우
+    if not text:
+        return {'error': 'No text found at the provided link.'}
+
+    sentiment_score = analyze_sentiment(text, score=0)  # score를 0으로 설정 (뉴스에는 upvote, downvote가 없기 때문에)
+    
+    return {
+        'link': link,
+        'sentiment_score': sentiment_score
+    }
 
 def preprocess():
     # 필요시 전처리 작업 수행

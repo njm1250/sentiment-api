@@ -54,3 +54,4 @@ Response:
 
 ## Limitations
 - The API rate limit is set to 100 requests per hour per IP.
+- Each request can analyze a maximum of 512 characters per input. Texts longer than this limit will be truncated before analysis.
