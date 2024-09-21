@@ -53,5 +53,6 @@ Response:
 - Dynamic content like social media posts or pages with JavaScript-rendered content may not be parsed correctly.
 
 ## Limitations
+- **Currently, only English language content is supported.**
 - The API rate limit is set to 100 requests per hour per IP.
 - Each request can analyze a maximum of 512 characters per input. Texts longer than this limit will be truncated before analysis.
