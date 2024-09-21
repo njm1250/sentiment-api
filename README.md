@@ -47,6 +47,10 @@ Response:
 ```
 ### Request Parameters
 - **link** (required): The link to analyze (e.g., `https://example.com/article`).
+  
+### Usage Tips
+- This feature works best with static content such as news articles or blog posts.
+- Dynamic content like social media posts or pages with JavaScript-rendered content may not be parsed correctly.
 
 ## Limitations
 - The API rate limit is set to 100 requests per hour per IP.
