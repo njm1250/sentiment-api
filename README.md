@@ -2,6 +2,37 @@
 
 An API that provides sentiment analysis for various purposes. It helps users understand the sentiment around topics such as stocks and cryptocurrencies using data from social media. Currently, the data comes exclusively from Reddit.
 
+## Installation
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-username/sentiment-api.git
+   cd sentiment-api
+   ```
+
+2. **Create and activate a virtual environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+   ```
+
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Set up environment variables**:
+   - Create a `.env` file in the root directory and add your Reddit API credentials:
+   ```env
+   REDDIT_CLIENT_ID=your_client_id
+   REDDIT_SECRET=your_secret
+   REDDIT_USER_AGENT=your_user_agent
+   ```
+
+5. **Run the server locally**:
+   ```bash
+   python manage.py runserver
+   ```
+
 ## Features
 - **Keyword-based Sentiment Analysis**: Analyze sentiment based on specific keywords.
 - **Media Link Analysis**: Perform sentiment analysis on articles and media content based on URLs.
